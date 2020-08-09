@@ -1,26 +1,22 @@
-cmake_minimum_required( VERSION 2.8 )
+cmake_minimum_required(VERSION 3.0)
 
-## Load CMAKE configuration from environment variables
-set( CMAKE_MODULE_PATH $ENV{CMAKE_MODULE_PATH} )
-set( CMAKE_PREFIX_PATH $ENV{CMAKE_PREFIX_PATH} )
+project(raytracer)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}")
+find_package(sdl2 REQUIRED)
 
-## Specify a project name
-project( RayTracer )
+set( THIRD_PARTY_INCLUDE_DIR        ${SDL2_INCLUDE_DIRS} ${GTEST_INCLUDE_DIR} )
+set( EXTERNAL_INCLUDE_DIR           ${PROJECT_SOURCE_DIR}/include )
+set( INTERNAL_INCLUDE_DIR           ${PROJECT_SOURCE_DIR}/src )
 
-set( CMAKE_CXX_FLAGS "-Wpedantic -Wall -O0 -std=c++17 -g" )
+set( BINARY_OUTPUT_DIR              ${CMAKE_SOURCE_DIR}/bin )
+set( TEST_BINARY_OUTPUT_DIR         ${CMAKE_SOURCE_DIR}/bin/test )
 
-## Set the build type
-if( NOT CMAKE_BUILD_TYPE )
-  set( CMAKE_BUILD_TYPE "Release" 
-       CACHE STRING "Build configuration 'Release' or 'Debug'."
-       FORCE )
-endif()
+set( CMAKE_LIBRARY_PATH             ${BINARY_OUTPUT_DIR} )
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIR} )
 
-## Install the executable to <install_directory>/bin
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-## Install libraries (if any) to <install_directory>/bin
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wextra -Wpedantic -Wall -O0 -g")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter")
 
-add_subdirectory(${PROJECT_SOURCE_DIR}/src bin)
+enable_testing()
+
+add_subdirectory("${PROJECT_SOURCE_DIR}/src")

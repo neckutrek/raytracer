@@ -1,3 +1,8 @@
+/build
+/bin
+/xcode
+**.DS_Store
+
 # Prerequisites
 *.d
 

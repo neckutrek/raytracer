@@ -1,38 +1,80 @@
-#include "SDL.h"
-#include <stdio.h>
+#include <SDL.h>
 
-int main(int argc, char* argv[]) {
+struct Window
+{
+   SDL_Window*    window   = nullptr;
+   SDL_Renderer*  renderer = nullptr;
+   SDL_Texture*   texture  = nullptr;
+   Uint32*        pixels   = nullptr;
 
-SDL_Window *window;                    // Declare a pointer
+   Window(unsigned int width, unsigned int height)
+   {
+      SDL_Init(SDL_INIT_VIDEO);
+      window = SDL_CreateWindow("SDL2 Pixel Drawing",
+                                 SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, 0);
+      renderer = SDL_CreateRenderer(window, -1, 0);
+      texture = SDL_CreateTexture(renderer,
+                                    SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, width, height);
+      pixels = new Uint32[width * height];
+      memset(pixels, 0xffffffff, width * height * sizeof(Uint32));
+   }
 
-SDL_Init(SDL_INIT_VIDEO);              // Initialize SDL2
+   ~Window()
+   {
+      delete[] pixels;
+      SDL_DestroyTexture(texture);
+      SDL_DestroyRenderer(renderer);
+      SDL_DestroyWindow(window);
+   }
+};
 
-// Create an application window with the following settings:
-window = SDL_CreateWindow(
-    "An SDL2 window",                  // window title
-    SDL_WINDOWPOS_UNDEFINED,           // initial x position
-    SDL_WINDOWPOS_UNDEFINED,           // initial y position
-    640,                               // width, in pixels
-    480,                               // height, in pixels
-    SDL_WINDOW_OPENGL                  // flags - see below
-);
-
-// Check that the window was successfully created
-if (window == NULL) {
-    // In the case that the window could not be made...
-    printf("Could not create window: %s\n", SDL_GetError());
-    return 1;
+unsigned int linearIndex(unsigned int row, unsigned int col, unsigned int width)
+{
+   return row*width + col;
 }
 
-// A basic main loop to prevent blocking
-bool is_running = true;
-SDL_Event event;
-while (is_running) {
-    while (SDL_PollEvent(&event)) {
-        if (event.type == SDL_QUIT) {
-            is_running = false;
-        }
-    }
-    SDL_Delay(16);
+void renderRaytracer(Uint32* pixels, unsigned int width, unsigned int height)
+{
+   for (unsigned int r=height/2, c=0; c < width; ++c)
+   {
+      pixels[linearIndex(r, c, width)] = 0xff0000;
+   }
+   for (unsigned int r=0, c=width/2; r < height; ++r)
+   {
+      pixels[linearIndex(r, c, width)] = 0xff0000;
+   }
 }
+
+int main(int argc, char ** argv)
+{
+   constexpr unsigned int screen_width = 800;
+   constexpr unsigned int screen_height = 600;
+   Window w(screen_width, screen_height);
+
+   bool quit = false;
+   SDL_Event event;
+   while (!quit)
+   {
+      SDL_UpdateTexture(w.texture, NULL, w.pixels, screen_width * sizeof(Uint32));
+
+      while (SDL_PollEvent(&event))
+      {
+         switch (event.type)
+         {
+         case SDL_QUIT:
+            quit = true;
+            break;
+         }
+      }
+
+      renderRaytracer(w.pixels, screen_width, screen_height);
+
+      SDL_RenderClear(w.renderer);
+      SDL_RenderCopy(w.renderer, w.texture, NULL, NULL);
+      SDL_RenderPresent(w.renderer);
+   }
+
+   SDL_Quit();
+
+    return 0;
 }

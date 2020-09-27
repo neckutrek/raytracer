@@ -1,5 +1,6 @@
 set(SOURCES
-   main.cpp)
+   main.cpp
+   render.cpp)
 
 add_executable(main ${SOURCES})
 target_include_directories(main PUBLIC ${SDL2_INCLUDE_DIRS})

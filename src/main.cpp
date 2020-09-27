@@ -1,5 +1,7 @@
 #include <SDL.h>
 
+void renderRaytracer(Uint32* pixels, unsigned int width, unsigned int height);
+
 struct Window
 {
    SDL_Window*    window   = nullptr;
@@ -28,27 +30,10 @@ struct Window
    }
 };
 
-unsigned int linearIndex(unsigned int row, unsigned int col, unsigned int width)
-{
-   return row*width + col;
-}
-
-void renderRaytracer(Uint32* pixels, unsigned int width, unsigned int height)
-{
-   for (unsigned int r=height/2, c=0; c < width; ++c)
-   {
-      pixels[linearIndex(r, c, width)] = 0xff0000;
-   }
-   for (unsigned int r=0, c=width/2; r < height; ++r)
-   {
-      pixels[linearIndex(r, c, width)] = 0xff0000;
-   }
-}
-
 int main(int argc, char ** argv)
 {
-   constexpr unsigned int screen_width = 800;
-   constexpr unsigned int screen_height = 600;
+   constexpr unsigned int screen_width = 1024;
+   constexpr unsigned int screen_height = 768;
    Window w(screen_width, screen_height);
 
    bool quit = false;
@@ -56,7 +41,6 @@ int main(int argc, char ** argv)
    while (!quit)
    {
       SDL_UpdateTexture(w.texture, NULL, w.pixels, screen_width * sizeof(Uint32));
-
       while (SDL_PollEvent(&event))
       {
          switch (event.type)
@@ -66,9 +50,8 @@ int main(int argc, char ** argv)
             break;
          }
       }
-
+      SDL_Delay(1000/90);
       renderRaytracer(w.pixels, screen_width, screen_height);
-
       SDL_RenderClear(w.renderer);
       SDL_RenderCopy(w.renderer, w.texture, NULL, NULL);
       SDL_RenderPresent(w.renderer);

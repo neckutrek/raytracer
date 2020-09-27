@@ -2,6 +2,9 @@
 /bin
 /xcode
 **.DS_Store
+**.swp
+compile_commands.json
+/.clangd
 
 # Prerequisites
 *.d

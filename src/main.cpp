@@ -1,8 +1,7 @@
 #include <SDL.h>
 
 #include "window.h"
-
-void renderRaytracer(Uint32* pixels, unsigned int width, unsigned int height);
+#include "render.h"
 
 int main(int argc, char ** argv)
 {
@@ -10,6 +9,7 @@ int main(int argc, char ** argv)
    constexpr unsigned int screen_height = 768;
    Window w(screen_width, screen_height);
 
+   float time = 0.0f;
    bool quit = false;
    SDL_Event event;
    while (!quit)
@@ -25,7 +25,8 @@ int main(int argc, char ** argv)
          }
       }
       SDL_Delay(1000/90);
-      renderRaytracer(w.data(), screen_width, screen_height);
+      time += 1000/90;
+      renderRaytracer(w.data(), screen_width, screen_height, time);
       w.draw();
    }
 
